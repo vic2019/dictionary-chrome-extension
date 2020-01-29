@@ -1,0 +1,189 @@
+.popupNode {
+  box-sizing: border-box;
+  background: #eef0ff;
+  border: 3px solid #D71920;
+  border-radius: 9px;
+  margin: 0px;
+  padding: 10px 16px;
+  height: 416px;
+  width: 408px;
+  box-shadow: 3px 4px 5px rgba(0, 0, 0, .3);
+  overflow: scroll;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 100%;
+  line-height: 1.3;
+  text-align: left;
+  font-style: normal;
+  color: black;
+}
+
+.sn-box {
+  display: flex;
+  flex-flow: row;
+}
+
+.sn-content {
+  display: flex;
+  flex-flow: column;
+}
+
+.sn {
+  font-weight: bold;
+  margin-right: 0.5em;
+}
+
+.hw {
+ display: inline-block;
+ margin: 0.2em 0.1em 0.2em 0em;
+ font-size: 145%; 
+ font-weight: bold;
+ vertical-align: baseline;
+}
+
+.entry, .in, .def, .un, .dx, .uro, .dre, .sin, .cx, .wsgram, .gram, .suggestion, .lb {
+  display: block;
+}
+
+.fl, .it, .il, .phrase, .sl, .ssl, .slb, .tag, .usageref, .lb {
+  font-style: italic;
+}
+
+.fl, .if, .ure, .dre, .pva, .va {
+  font-weight: bold;
+}
+
+.fl, .if, .il, .wsgram, .gram, .sgram, .hsl {
+  color: #747474;
+}
+
+.pr::before, .altpr::before {
+  content: "/";
+}
+
+.pr::after, .altpr::after {
+  content: "/";
+}
+
+.if::after {
+  content: ";"
+}
+
+.wsgram::before, .sgram::before, .gram::before {
+  content: "[";
+}
+
+.wsgram::after, .sgram::after, .gram::after {
+  content: "]";
+}
+
+.vi {
+  display:list-item;
+  list-style: square inside;
+  margin: 0.1em 0em 0.1em 3.5em;   
+}
+
+.sn-content .vi {
+  margin-left: 2.5em; 
+}
+
+.sn-content > .sn-box > .sn-content .vi {
+  margin-left: 1.5em; 
+}
+
+.exampleButton {
+  display: list-item;
+  list-style: none;
+  color: #0000e4;
+  margin: 0.1em 0em 0.1em 3.5em;  
+}
+
+.sn-content .exampleButton {
+  margin-left: 2.5em;
+}
+
+.sn-content > .sn-box > .sn-content .exampleButton {
+  margin-left: 1.5em; 
+}
+
+.vt {
+  display: block;
+  color: #747474;
+  text-transform: uppercase;
+  font-size: 80%;
+  font-weight: bold;  
+}
+
+.un::before {
+  content: "\2014" " ";
+}
+
+.dx::before {
+  content: "\2014" " ";
+}
+
+.dxt::after {
+  content: ';';
+}
+
+.dxt, .sx, .ct {
+  text-transform: uppercase;
+}
+
+.ure::before {
+  content: "\2014" " ";
+}
+
+.pr, .altpr {
+  color: #747474;
+  margin-left: 0.1em;
+  margin-right: 0.1em;
+}
+
+.sound, .art {
+  display: none;
+}
+
+.bookmarkButton:hover, .dictLogo:hover, .playButton:hover, .openInTab:hover, .exampleButton:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.openInTab {
+  color: #0000e4;
+}
+
+
+
+/* The below items are there for easy updates in the future
+
+.dxnl {
+  
+}
+
+.snote {
+
+}
+
+.snotebox {
+
+}
+
+.usage {
+  
+}
+
+.dro {
+
+} */
+
+
+
+
+
+
+
+
+
+
+
+
