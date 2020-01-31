@@ -1,5 +1,6 @@
-browser.storage.local.get('mode').then(result => {
-  if (result.mode === "context") {
+chrome.storage.local.get('mode', store => {
+  if (!store) return;
+  if (store.mode === "context") {
     document.getElementById('context').checked = true;
   } else {
     document.getElementById('dblclick').checked = true;
@@ -7,5 +8,5 @@ browser.storage.local.get('mode').then(result => {
 });
 
 document.getElementById('setMode').addEventListener('change', (event) => {
-  browser.storage.local.set({ mode: event.target.value });
+  chrome.storage.local.set({ mode: event.target.value });
 });

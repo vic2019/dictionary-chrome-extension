@@ -3,9 +3,9 @@
 document.addEventListener("dblclick", sendRequest);
 document.addEventListener("click", removePopup);
 
-chrome.storage.local.get('mode').then( result => {
-  if (!result) return;
-  if (result.mode === 'context') {
+chrome.storage.local.get('mode', store => {
+  if (!store) return;
+  if (store.mode === 'context') {
     document.removeEventListener('dblclick', sendRequest);
   }
 });
@@ -29,8 +29,6 @@ function sendRequest() {
   document.body.append(shadowHost);
 
   const word = selection.toString().trim();
-  let url;
-
   const url = `https://3rx9tdzpxi.execute-api.us-west-1.amazonaws.com/default/getDictionary/?word=${word}`;
 
   const encodedUrl = encodeURI(url);
@@ -83,7 +81,10 @@ function getStylesheet() {
 function createPopup(wordInfo) {  
   const popupNode = document.createElement('div');
   popupNode.className = 'popupNode';
-  popupNode.textContent = `Looking up "${wordInfo.word}"`;
+  const loading = document.createElement('div');
+  loading.textContent = `Looking up "${wordInfo.word}"`;
+  loading.className = 'loading';
+  popupNode.append(loading);
 
    // Set popup position
    const offsetHeight = 416;
@@ -141,7 +142,7 @@ function buildDOM(xmlNode) {
 
 function updateContent(selection, content, popupNode) {
   formatSns(content); // Adding .sn-box and .sn-content for styling purposes
-  popupNode.textContent = undefined;
+  popupNode.querySelector('.loading').remove();
   popupNode.append(content);
   
   addViToggle(content); // Adding the show/hide feature for example sentences
@@ -302,7 +303,7 @@ function addButtons(selection, popupNode) {
   dictLogo.className = 'dictLogo';
   dictLogo.title = 'See this entry at the Merriam-Webster website!';
   dictLogo.src = chrome.runtime.getURL("images/logo.png");
-  dictLogo.style = 'position: absolute; z-index: 16777270; width: 50px;';
+  // dictLogo.style = 'position: absolute; z-index: 16777270; width: 50px;';
   dictLogo.style.top = rect.top + pageYOffset + 9 + 'px';
   dictLogo.style.left = rect.right + pageXOffset - 63 + 'px';
   
