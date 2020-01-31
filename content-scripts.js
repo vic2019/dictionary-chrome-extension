@@ -3,18 +3,12 @@
 document.addEventListener("dblclick", sendRequest);
 document.addEventListener("click", removePopup);
 
-let KEY;
-chrome.storage.local.get(['key'], result => {
-  KEY = result.key;
+chrome.storage.local.get('mode').then( result => {
+  if (!result) return;
+  if (result.mode === 'context') {
+    document.removeEventListener('dblclick', sendRequest);
+  }
 });
-
-
-// Update the API key
-chrome.storage.onChanged.addListener( changes => {
-  const key = changes.key;
-  if (key.oldValue !== key.newValue) KEY = key.newValue;
-});
-
 
 chrome.runtime.onMessage.addListener( () => {
   sendRequest();
@@ -37,12 +31,7 @@ function sendRequest() {
   const word = selection.toString().trim();
   let url;
 
-  // Use a proxy if no key is given
-  if (!KEY) { 
-    url = `https://3rx9tdzpxi.execute-api.us-west-1.amazonaws.com/default/getDictionary/?word=${word}`;
-  } else {
-    url = `https://www.dictionaryapi.com/api/v1/references/learners/xml/${word}?key=${KEY}`;
-  }
+  const url = `https://3rx9tdzpxi.execute-api.us-west-1.amazonaws.com/default/getDictionary/?word=${word}`;
 
   const encodedUrl = encodeURI(url);
 
@@ -57,7 +46,8 @@ function sendRequest() {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(this.responseText, 'text/xml');
     const entryListNode = xmlDoc.getElementsByTagName('entry_list')[0];
-    // If response is a string of error message..
+
+    // If response is a string of error message.
     if (!entryListNode) {
       notFoundPage(selection, popupNode);
       return;
@@ -68,7 +58,7 @@ function sendRequest() {
     // If response is a list of suggestions..
     if (content.firstElementChild.className === 'suggestion') {
       const heading = document.createElement('p');
-      heading.innerHTML = 'Did you mean\u2014'
+      heading.textContent = 'Did you mean to search for—'
       content.prepend(heading);
       content.append(document.createElement('br'));
     }
@@ -93,8 +83,7 @@ function getStylesheet() {
 function createPopup(wordInfo) {  
   const popupNode = document.createElement('div');
   popupNode.className = 'popupNode';
-  popupNode.innerHTML = `<p style='font-size:120%; text-align:center;'>Looking up "${wordInfo.word}"...</p>`;
-
+  popupNode.textContent = `Looking up "${wordInfo.word}"`;
 
    // Set popup position
    const offsetHeight = 416;
@@ -152,7 +141,7 @@ function buildDOM(xmlNode) {
 
 function updateContent(selection, content, popupNode) {
   formatSns(content); // Adding .sn-box and .sn-content for styling purposes
-  popupNode.innerHTML = '';
+  popupNode.textContent = undefined;
   popupNode.append(content);
   
   addViToggle(content); // Adding the show/hide feature for example sentences
@@ -168,13 +157,13 @@ function formatSns(content) {
   
   // Splitting one 'sn' into two 'sn's if the sn contains multiple values separated by space 
   for (let snElem of sns) {
-    const snParts = snElem.innerHTML.trim().split(' ');
+    const snParts = snElem.textContent.trim().split(' ');
     if (snParts.length === 1) continue;
     
     for (let sn of snParts) {
       const newSnElem = document.createElement('span');
       newSnElem.className = 'sn';
-      newSnElem.innerHTML = sn;
+      newSnElem.textContent = sn;
       snElem.before(newSnElem);
     }
     
@@ -199,7 +188,7 @@ function formatSns(content) {
   
 
   function isSubsense(snElem) {
-    return isNaN(parseInt(snElem.innerHTML));
+    return isNaN(parseInt(snElem.textContent));
   }
   
   function reformat(snElem) {
@@ -243,7 +232,7 @@ function addViToggle(content) {
         !vi.nextElementSibling.className.includes('vi')) {
           const viToggle = document.createElement('span');
           viToggle.className = 'exampleButton';
-          viToggle.innerHTML = '[+] more examples';
+          viToggle.textContent = '[+] more examples';
           let hidden = false;
           const selector = `hiddenExample${index}`;
           const toHide = content.getElementsByClassName(selector);
@@ -253,7 +242,7 @@ function addViToggle(content) {
               item.style.display = hidden? 'none': 'list-item';
             }
             
-            viToggle.innerHTML = hidden? '[+] more examples': '[-] hide examples';
+            viToggle.textContent = hidden? '[+] more examples': '[-] hide examples';
             hidden = hidden? false: true;
           };
           
@@ -282,7 +271,7 @@ function addButtons(selection, popupNode) {
   });
 
   function getAudio(audio) {
-    const fileName = audio.innerHTML;
+    const fileName = audio.innerText;
     let subDir = fileName.slice(0, 1);
     
     if (fileName.slice(0, 3) === 'bix') {
@@ -331,7 +320,6 @@ function addButtons(selection, popupNode) {
   const bookmarkUrl = encodeURI(`http://learnersdictionary.com/definition/${word.toLowerCase()}`);
   const bookmarkButton = document.createElement('img');
   bookmarkButton.className = 'bookmarkButton';
-  // bookmarkButton.title = 'Bookmark this entry!';
   bookmarkButton.style = 'position: absolute; z-index: 16777270; max-width: 22px;';
   bookmarkButton.style.top = rect.bottom + pageYOffset - 30 + 'px';
   bookmarkButton.style.left = rect.right + pageXOffset - 32 + 'px';
@@ -371,7 +359,7 @@ function linkGoogle(selection) {
   const googleUrl = `https://www.google.com/search?q=${word}+definition`;
   const googleLink = document.createElement('span');
   googleLink.className = 'openInTab';
-  googleLink.innerHTML = 'Search Google?';
+  googleLink.textContent = 'Search Google?';
   googleLink.onclick = () => {
     chrome.runtime.sendMessage({
       url: googleUrl,
@@ -388,7 +376,7 @@ function addLinks(popupNode) {
   const linkElems = popupNode.querySelectorAll('.dxt, .sx, .ct, .suggestion');
   
   for (let elem of linkElems) {
-    let word = elem.innerHTML.match(/[/-\w\s\d]*/)[0];
+    let word = elem.innerText.match(/[/-\w\s\d]*/)[0];
     let url = `http://learnersdictionary.com/definition/${word}`
     elem.className += ' openInTab';
     elem.onclick = () => {
@@ -404,7 +392,7 @@ function addLinks(popupNode) {
 function notFoundPage(selection, popupNode) {
   popupNode.style.fontSize = '125%';
   popupNode.style.textAlign = 'center';
-  popupNode.innerHTML = "<Br><p>No results found (or invalid API key).</p>";
+  popupNode.textContent = "No results found.";
   popupNode.append(linkGoogle(selection));
   
 }
